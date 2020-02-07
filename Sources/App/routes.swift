@@ -6,15 +6,26 @@ public func routes(_ router: Router) throws {
     router.get { req in
         return "It works!"
     }
-    
-    // Basic "Hello, world!" example
-    router.get("hello") { req in
-        return "Hello, world!"
+
+    router.get("me") { req -> User in
+        return User(id: "f188b595-1577-4580-9fb6-9d36d9d55b69",
+                    displayName: "Moore, Christopher",
+                    businessPhones: [],
+                    givenName: "Christopher",
+                    jobTitle: "CW-Professional",
+                    mail: "Christopher.Moore2@duke-energy.com",
+                    mobilePhone: nil,
+                    officeLocation: nil,
+                    preferredLanguage: nil,
+                    surname: "Moore",
+                    userPrincipalName: "Christopher.Moore2@duke-energy.com")
     }
 
-    // Example of configuring a controller
-    let todoController = TodoController()
-    router.get("todos", use: todoController.index)
-    router.post("todos", use: todoController.create)
-    router.delete("todos", Todo.parameter, use: todoController.delete)
+    router.post("me", "findMeetingTimes") { req -> Future<FindMeetingResponse> in
+        return req.content.get(FindMeetingRequest.self)
+            .map(to: FindMeetingResponse.self) { request in
+                dump(request)
+                return FindMeetingResponse.mock(timeslot: request.timeConstraint.timeslots.first!)
+        }
+    }
 }
